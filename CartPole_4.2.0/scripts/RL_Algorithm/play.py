@@ -105,10 +105,12 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
         discount_factor=discount
     )
 
+    task_name = str(args_cli.task).split('-')[0]  # Stabilize, SwingUp
     Algorithm_name = "Q_Learning"  
-    q_value_file = "name.json"
-    full_path = os.path.join("q_value", Algorithm_name)
-    agent.load_model(full_path, q_value_file)
+    episode = 0
+    q_value_file = f"{Algorithm_name}_{episode}_{num_of_action}_{action_range[1]}_{discretize_state_weight[0]}_{discretize_state_weight[1]}.json"
+    full_path = os.path.join(f"q_value/{task_name}", Algorithm_name)
+    agent.load_q_value(full_path, q_value_file)
 
     # reset environment
     obs, _ = env.reset()

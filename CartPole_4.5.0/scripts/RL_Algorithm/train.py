@@ -166,7 +166,7 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
                     # Save Q-Learning agent
                     q_value_file = f"{Algorithm_name}_{episode}_{num_of_action}_{action_range[1]}_{discretize_state_weight[0]}_{discretize_state_weight[1]}.json"
                     full_path = os.path.join(f"q_value/{task_name}", Algorithm_name)
-                    agent.save_model(full_path, q_value_file)
+                    agent.save_q_value(full_path, q_value_file)
 
                 agent.decay_epsilon()
              

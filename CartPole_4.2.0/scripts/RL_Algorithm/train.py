@@ -115,6 +115,8 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
     final_epsilon = None
     discount = None
 
+    task_name = str(args_cli.task).split('-')[0]  # Stabilize, SwingUp
+    Algorithm_name = "Q_Learning"
     agent = Q_Learning(
         num_of_action=num_of_action,
         action_range=action_range,
@@ -163,13 +165,13 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
                     print("avg_score: ", sum_reward / 100.0)
                     sum_reward = 0
                     print(agent.epsilon)
+
+                    # Save Q-Learning agent
+                    q_value_file = f"{Algorithm_name}_{episode}_{num_of_action}_{action_range[1]}_{discretize_state_weight[0]}_{discretize_state_weight[1]}.json"
+                    full_path = os.path.join(f"q_value/{task_name}", Algorithm_name)
+                    agent.save_q_value(full_path, q_value_file)
+
                 agent.decay_epsilon()
-            
-            # Save Q-Learning agent
-            Algorithm_name = "Q_Learning"
-            q_value_file = "name.json"
-            full_path = os.path.join("q_value", Algorithm_name)
-            agent.save_model(full_path, q_value_file)
             
         if args_cli.video:
             timestep += 1

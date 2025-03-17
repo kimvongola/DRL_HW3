@@ -104,7 +104,7 @@ def main():
     episode = 0
     q_value_file = f"{Algorithm_name}_{episode}_{num_of_action}_{action_range[1]}_{discretize_state_weight[0]}_{discretize_state_weight[1]}.json"
     full_path = os.path.join(f"q_value/{task_name}", Algorithm_name)
-    agent.load_model(full_path, q_value_file)
+    agent.load_q_value(full_path, q_value_file)
 
     # reset environment
     obs, _ = env.reset()
