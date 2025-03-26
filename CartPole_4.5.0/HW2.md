@@ -127,4 +127,4 @@ You must evaluate the agent's performance in terms of **learning efficiency** (i
 3. How do the resolutions of the action space and observation space affect the learning process? Why?
 
 Idea for visulization:
-![3D Surface Plot of Q-Values]([https://github.com/user-attachments/assets/bc27919c-2605-43be-8af1-46e55a84d574](https://media.githubusercontent.com/media/S-Tuchapong/FRA503-Deep-Reinforcement-Learning-for-Robotics/refs/heads/main/CartPole_4.5.0/HW%20materials/3D%20Surface%20Plot%20of%20Q-Values.png))
+![3D Surface Plot of Q-Values](https://media.githubusercontent.com/media/S-Tuchapong/FRA503-Deep-Reinforcement-Learning-for-Robotics/refs/heads/main/CartPole_4.5.0/HW%20materials/3D%20Surface%20Plot%20of%20Q-Values.png)
