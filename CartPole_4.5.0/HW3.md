@@ -15,12 +15,30 @@ Additionally, as in the previous homework, the `CartPole` extension repository i
 
 3. Understand how advanced RL algorithms balance exploration and exploitation.
 
-4. Be able to classify and gain insight into different reinforcement learning algorithms, including Linear Q-Learning, Deep Q-Network (DQN), the REINFORCE algorithm, and the Actor-Critic algorithm. Analyze their strengths and weaknesses.
+4. Be able to differentiate RL algorithms based on stochastic or deterministic policies, as well as value-based, policy-based, or Actor-Critic approaches. 
 
+5. Gain insight into different reinforcement learning algorithms, including Linear Q-Learning, Deep Q-Network (DQN), the REINFORCE algorithm, and the Actor-Critic algorithm. Analyze their strengths and weaknesses.
 
-### Part 1: Setting up `Cart-Pole` Agent.
+### Part 1: Understanding the Algorithm
+In this homework, you have to implement 4 different function approximation-based RL algorithms:
 
-For the first part of this homework, you will implement a Cart-Pole agent from scratch, i.e., you must implement the **constructor** and **core functions** of the `RL Base Class`, as well as the **algorithms** in the Algorithm folder. The core components should include, but are not limited to:
+- **Linear Q-Learning**
+
+- **Deep Q-Network** (DQN)
+
+- **REINFORCE algorithm**
+
+- One algorithm chosen from the following Actor-Critic methods:
+    - **Deep Deterministic Policy Gradient** (DDPG)
+    - **Advantage Actor-Critic** (A2C)
+    - **Proximal Policy Optimization** (PPO)
+    - **Soft Actor-Critic** (SAC)
+
+For each algorithm, describe whether it follows a value-based, policy-based, or Actor-Critic approach, and specify the type of policy it learns: stochastic or deterministic.
+
+### Part 2: Setting up `Cart-Pole` Agent.
+
+Similar to the previous homework, you will implement a common components that will be the same in most of the function approximation-based RL in the `RL_base_function.py`.The core components should include, but are not limited to:
 
 #### 1. RL Base class
 
@@ -47,38 +65,25 @@ This class should include:
     - **Discount factor**: A coefficient (γ) that determines the importance of future rewards in decision-making.
 
 - **Core Functions**
-    - `get_discretize_action()`: Returns a discrete action based on the current policy.
-
-    - `mapping_action()`: Converts a discrete action back into a continuous action within the defined action range.
-
-    - `discretize_state()`: Discretizes and scales the state based on observation weights.
+    - `get_dis_action()`: Returns a discrete action based on the current policy. This will only be used in Deep Q-learning.
 
     - `decay_epsilon()`: Decreases epsilon over time and returns the updated value.
 
-Additional details about these functions are provided in the class file.
-
-**Note:**
-The `RL Base Class` also include two additional functions:
-
-- `save_q_value()` which save model function from Q(s,a) as defaultdict.
-
-- `load_q_value()` which load model function from Q(s,a) as defaultdict.
-
-You may also implement additional functions for further analysis.
+Additional details about these functions are provided in the class file. You may also implement additional functions for further analysis.
 
 #### 2. Algorithm folder
 
 This folder should include:
 
-- **Monte Carlo class**
+- **Linear Q Learning class**
 
-- **SARSA class**
+- **Deep Q-Network class**
 
-- **Q-Learning Class**
+- **REINFORCE Class**
 
-- **Double Q-Learning Class**
+- One class chosen from the Part 1.
 
-Each class should **inherit** from the `RL Base class` and include:
+Each class should **inherit** from the `RL Base class` in `RL_base_function.py` and include:
 
 - A constructor which initializes the same variables as the class it inherits from.
 
@@ -86,7 +91,8 @@ Each class should **inherit** from the `RL Base class` and include:
 
 - An `update()` function that updates the agent’s learnable parameters and advances the training step.
 
-### Part 2: Trainning & Playing to stabilize `Cart-Pole` Agent.
+
+### Part 3: Trainning & Playing to stabilize `Cart-Pole` Agent.
 
 You need to implement the `training loop` in train script and `main()` in the play script (in the *"Can be modified"* area of both files). Additionally, you must collect data, analyze results, and save models for evaluating agent performance.
 
@@ -116,13 +122,9 @@ You need to implement the `training loop` in train script and `main()` in the pl
     python scripts/RL_Algorithm/play.py --task SwingUp-Isaac-Cartpole-v0 
     ```
 
-### Part 3: Evaluate `Cart-Pole` Agent performance.
+### Part 4: Evaluate `Cart-Pole` Agent performance.
 
 You must evaluate the agent's performance in terms of **learning efficiency** (i.e., how well the agent learns to receive higher rewards) and **deployment performance** (i.e., how well the agent performs in the Cart-Pole problem). Analyze and visualize the results to determine:
 
 1. Which algorithm performs best?
 2. Why does it perform better than the others?
-3. How do the resolutions of the action space and observation space affect the learning process? Why?
-
-Idea for visulization:
-![3D Surface Plot of Q-Values](https://media.githubusercontent.com/media/S-Tuchapong/FRA503-Deep-Reinforcement-Learning-for-Robotics/refs/heads/main/CartPole_4.5.0/HW%20materials/3D%20Surface%20Plot%20of%20Q-Values.png)
