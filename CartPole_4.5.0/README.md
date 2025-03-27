@@ -52,15 +52,22 @@ CARTPOLE
 │   │   ├── MC
 │   │   ├── Q_Learning
 │   │   └── SARSA
-│   ├── SwingUp
+│   └── SwingUp
 │  
 ├── RL_Algorithm
-│   ├── Algorithm
-│   │   ├── Double_Q_Learning
-│   │   ├── MC
-│   │   ├── Q_Learning
-│   │   └── SARSA
-│   └── RL_base.py
+│   ├── Table_based             # Homework 2
+│   │   ├── Double_Q_Learning.py
+│   │   ├── MC.py
+│   │   ├── Q_Learning.py
+│   │   └── SARSA.py
+│   │   
+│   ├── Function_based          # Homework 3
+│   │   ├── DQN.py
+│   │   ├── Linear_Q.py
+│   │   └── MC_REINFORCE.py
+│   │   
+│   ├── RL_base_table.py        # Homework 2
+│   └── RL_base_function.py     # Homework 3
 │
 └── scripts
     └── RL_Algorithm
@@ -94,19 +101,29 @@ CARTPOLE
 
 - **q_value:** Stores the trained `Q-value tables` as `JSON files`. Each subdirectory corresponds to a different `Q-value tables` learned by algorithms.
 
-- **RL_Algorithm:** This is where you'll implement your reinforcement learning algorithms for Homework 2:
+- **RL_Algorithm:** This is where you'll implement your reinforcement learning algorithms for Homeworks:
 
-    - **Algorithm:** Contains separate implementations for each RL approach:
+    - **Table_based:** Contains separate implementations for each table-based RL approach that has to be modified for **Homework 2**:
 
-        - `MC`
-
-        - `SARSA` 
+        - `Double Q-Learning`
+        
+        - `MC` (Monte-Carlo)
 
         - `Q-Learning`
 
-        - `Double Q-Learning`
+        - `SARSA` 
 
-    - **RL_base.py:** Provides the foundation classes with common methods such as:
+    - **Function_based:** Contains separate implementations for each function approximation-based RL approach that has to be modified for **Homework 3**:
+
+        - `AC`  (Actor-Critic)
+        
+        - `DQN`  (Deep Q-Network)
+
+        - `Linear_Q` (Linear Q-Learning)
+
+        - `MC_REINFORCE`
+
+    - **RL_base_table.py:** Provides the foundation classes with common methods for table-based RL approaches that has to be modified for **Homework 2** such as:
 
         - `get_action`
 
@@ -115,6 +132,16 @@ CARTPOLE
         - `save_model`
 
         - `load_model`
+        
+        Please refer to this file for more details on these functions.
+
+    - **RL_base_function.py:** Provides the foundation classes with common methods such for function approximation-based RL approaches that has to be modified for **Homework 3** such as:
+
+        - `get_action`
+
+        - `decay_epsilon` 
+
+        In **Homework 3**, you need to write functions to save and load model by yourself.
 
 
 - **scripts/RL_Algorithm:** Contains executable scripts for:

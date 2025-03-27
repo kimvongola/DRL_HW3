@@ -1,0 +1,128 @@
+# FRA 503: Deep Reinforcement Learning
+
+## Cart Pole [ HW3 ]
+
+After reviewing the updated `Cart-Pole` [instruction](https://github.com/S-Tuchapong/FRA503-Deep-Reinforcement-Learning-for-Robotics/tree/main/CartPole_4.5.0), you are now ready to proceed with the final homework.
+
+Similar to the previous homework, this assignment focuses on the **Stabilizing Cart-Pole Task**, but using function approximation-based RL approaches instead of table-based RL approaches.
+
+Additionally, as in the previous homework, the `CartPole` extension repository includes configurations for the **Swing-up Cart-Pole Task** as an optional resource for students seeking a more challenging task.
+
+### Learning Objectives:
+1. Understand how **function approximation** works and how to implement it.
+
+2. Understand how **policy-based RL** works and how to implement it.
+
+3. Understand how advanced RL algorithms balance exploration and exploitation.
+
+4. Be able to classify and gain insight into different reinforcement learning algorithms, including Linear Q-Learning, Deep Q-Network (DQN), the REINFORCE algorithm, and the Actor-Critic algorithm. Analyze their strengths and weaknesses.
+
+
+### Part 1: Setting up `Cart-Pole` Agent.
+
+For the first part of this homework, you will implement a Cart-Pole agent from scratch, i.e., you must implement the **constructor** and **core functions** of the `RL Base Class`, as well as the **algorithms** in the Algorithm folder. The core components should include, but are not limited to:
+
+#### 1. RL Base class
+
+This class should include:
+
+- **Constructor `(__init__)`** to initialize the following parameters:
+
+    - **Control type**: Enumeration of RL algorithms used for decision-making (i.e. Monte Carlo, Temporal Difference, Q-learning, or Double Q-learning).
+
+    - **Number of actions**: The total number of discrete actions available to the agent.
+
+    - **Action range**: The minimum and maximum values defining the range of possible actions.
+
+    - **Discretize state weight**: Weighting factor applied when discretizing the state space for learning.
+
+    - **Learning rate**: Determines how quickly the model updates based on new information.
+
+    - **Initial epsilon**: The starting probability of taking a random action in an ε-greedy policy.
+
+    - **Epsilon decay rate**: The rate at which epsilon decreases over time to favor exploitation over exploration.
+
+    - **Final epsilon**: The lowest value epsilon can reach, ensuring some level of exploration remains.
+
+    - **Discount factor**: A coefficient (γ) that determines the importance of future rewards in decision-making.
+
+- **Core Functions**
+    - `get_discretize_action()`: Returns a discrete action based on the current policy.
+
+    - `mapping_action()`: Converts a discrete action back into a continuous action within the defined action range.
+
+    - `discretize_state()`: Discretizes and scales the state based on observation weights.
+
+    - `decay_epsilon()`: Decreases epsilon over time and returns the updated value.
+
+Additional details about these functions are provided in the class file.
+
+**Note:**
+The `RL Base Class` also include two additional functions:
+
+- `save_q_value()` which save model function from Q(s,a) as defaultdict.
+
+- `load_q_value()` which load model function from Q(s,a) as defaultdict.
+
+You may also implement additional functions for further analysis.
+
+#### 2. Algorithm folder
+
+This folder should include:
+
+- **Monte Carlo class**
+
+- **SARSA class**
+
+- **Q-Learning Class**
+
+- **Double Q-Learning Class**
+
+Each class should **inherit** from the `RL Base class` and include:
+
+- A constructor which initializes the same variables as the class it inherits from.
+
+- Superclass Initialization (`super().__init__()`).
+
+- An `update()` function that updates the agent’s learnable parameters and advances the training step.
+
+### Part 2: Trainning & Playing to stabilize `Cart-Pole` Agent.
+
+You need to implement the `training loop` in train script and `main()` in the play script (in the *"Can be modified"* area of both files). Additionally, you must collect data, analyze results, and save models for evaluating agent performance.
+
+#### Training the Agent
+
+1. `Stabilizing` Cart-Pole Task
+
+    ```
+    python scripts/RL_Algorithm/train.py --task Stabilize-Isaac-Cartpole-v0 
+    ```
+
+2. `Swing-up` Cart-Pole Task (Optional)
+    ```
+    python scripts/RL_Algorithm/train.py --task SwingUp-Isaac-Cartpole-v0
+    ```
+
+#### Playing
+
+1. `Stabilize` Cart-Pole Task
+
+    ```
+    python scripts/RL_Algorithm/play.py --task Stabilize-Isaac-Cartpole-v0 
+    ```
+
+2. `Swing-up` Cart-Pole Task (Optional)
+    ```
+    python scripts/RL_Algorithm/play.py --task SwingUp-Isaac-Cartpole-v0 
+    ```
+
+### Part 3: Evaluate `Cart-Pole` Agent performance.
+
+You must evaluate the agent's performance in terms of **learning efficiency** (i.e., how well the agent learns to receive higher rewards) and **deployment performance** (i.e., how well the agent performs in the Cart-Pole problem). Analyze and visualize the results to determine:
+
+1. Which algorithm performs best?
+2. Why does it perform better than the others?
+3. How do the resolutions of the action space and observation space affect the learning process? Why?
+
+Idea for visulization:
+![3D Surface Plot of Q-Values](https://media.githubusercontent.com/media/S-Tuchapong/FRA503-Deep-Reinforcement-Learning-for-Robotics/refs/heads/main/CartPole_4.5.0/HW%20materials/3D%20Surface%20Plot%20of%20Q-Values.png)
