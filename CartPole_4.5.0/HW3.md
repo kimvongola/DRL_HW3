@@ -68,6 +68,8 @@ This class should include:
 - **Core Functions**
     - `get_dis_action()`: Returns a discrete action based on the current policy. This will only be used in Deep Q-learning.
 
+    - `get_action()`: Returns a discrete action based on the current policy.
+
     - `decay_epsilon()`: Decreases epsilon over time and returns the updated value.
 
 Additional details about these functions are provided in the class file. You may also implement additional functions for further analysis.
