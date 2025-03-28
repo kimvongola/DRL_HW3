@@ -69,6 +69,10 @@ This class should include:
 
     - **Discount factor**: A coefficient (γ) that determines the importance of future rewards in decision-making.
 
+    - **Buffer size**: Maximum number of experiences the buffer can hold.
+
+    - **Batch size**: Number of experiences to sample per batch.
+
 - **Core Functions**
     - `get_dis_action()`: Returns a discrete action based on the current policy. This will only be used in Deep Q-learning.
 
