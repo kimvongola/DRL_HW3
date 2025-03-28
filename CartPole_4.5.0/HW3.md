@@ -8,6 +8,12 @@ Similar to the previous homework, this assignment focuses on the **Stabilizing C
 
 Additionally, as in the previous homework, the `CartPole` extension repository includes configurations for the **Swing-up Cart-Pole Task** as an optional resource for students seeking a more challenging task.
 
+### Single Agent Training
+![Single-Agent](https://github.com/S-Tuchapong/FRA503-Deep-Reinforcement-Learning-for-Robotics/blob/main/CartPole_4.5.0/HW%20materials/Stabilize%20Cart-Pole%20Task.webm)
+
+### Parallel-Agent Training
+![Parallel-Agent](https://github.com/S-Tuchapong/FRA503-Deep-Reinforcement-Learning-for-Robotics/blob/main/CartPole_4.5.0/HW%20materials/parallel_training.mkv)
+
 ### Learning Objectives:
 1. Understand how **function approximation** works and how to implement it.
 
@@ -46,8 +52,6 @@ Similar to the previous homework, you will implement a common components that wi
 This class should include:
 
 - **Constructor `(__init__)`** to initialize the following parameters:
-
-    - **Control type**: Enumeration of RL algorithms used for decision-making (i.e. Monte Carlo, Temporal Difference, Q-learning, or Double Q-learning).
 
     - **Number of actions**: The total number of discrete actions available to the agent.
 
