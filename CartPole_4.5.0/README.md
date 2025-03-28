@@ -66,7 +66,7 @@ CARTPOLE
 │   │   ├── Linear_Q.py
 │   │   └── MC_REINFORCE.py
 │   │   
-│   ├── RL_base_table.py        # Homework 2
+│   ├── RL_base.py              # Homework 2
 │   └── RL_base_function.py     # Homework 3
 │
 └── scripts
@@ -123,7 +123,7 @@ CARTPOLE
 
         - `MC_REINFORCE`
 
-    - **RL_base_table.py:** Provides the foundation classes with common methods for table-based RL approaches that has to be modified for **Homework 2** such as:
+    - **RL_base.py:** Provides the foundation classes with common methods for table-based RL approaches that has to be modified for **Homework 2** such as:
 
         - `get_action`
 
