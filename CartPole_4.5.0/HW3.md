@@ -106,12 +106,12 @@ You need to implement the `training loop` in train script and `main()` in the pl
 1. `Stabilizing` Cart-Pole Task
 
     ```
-    python scripts/RL_Algorithm/train.py --task Stabilize-Isaac-Cartpole-v0 
+    python scripts/Function_based/train.py --task Stabilize-Isaac-Cartpole-v0 
     ```
 
 2. `Swing-up` Cart-Pole Task (Optional)
     ```
-    python scripts/RL_Algorithm/train.py --task SwingUp-Isaac-Cartpole-v0
+    python scripts/Function_based/train.py --task SwingUp-Isaac-Cartpole-v0
     ```
 
 #### Playing
@@ -119,12 +119,12 @@ You need to implement the `training loop` in train script and `main()` in the pl
 1. `Stabilize` Cart-Pole Task
 
     ```
-    python scripts/RL_Algorithm/play.py --task Stabilize-Isaac-Cartpole-v0 
+    python scripts/Function_based/play.py --task Stabilize-Isaac-Cartpole-v0 
     ```
 
 2. `Swing-up` Cart-Pole Task (Optional)
     ```
-    python scripts/RL_Algorithm/play.py --task SwingUp-Isaac-Cartpole-v0 
+    python scripts/Function_based/play.py --task SwingUp-Isaac-Cartpole-v0 
     ```
 
 ### Part 4: Evaluate `Cart-Pole` Agent performance.
