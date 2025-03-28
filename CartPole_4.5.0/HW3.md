@@ -34,7 +34,7 @@ In this homework, you have to implement 4 different function approximation-based
     - **Proximal Policy Optimization** (PPO)
     - **Soft Actor-Critic** (SAC)
 
-For each algorithm, describe whether it follows a value-based, policy-based, or Actor-Critic approach, and specify the type of policy it learns: stochastic or deterministic.
+For each algorithm, describe whether it follows a value-based, policy-based, or Actor-Critic approach, specify the type of policy it learns (stochastic or deterministic), and explain how each advanced RL method balances exploration and exploitation.
 
 ### Part 2: Setting up `Cart-Pole` Agent.
 
