@@ -80,9 +80,9 @@ A class use to store state, action, reward, and next state from each timestep in
 
 - **Constructor `(__init__)`** to initialize the following parameters:
   
-    - memory: FIFO buffer to store the trajectory within a certain time window.
+    - **memory**: FIFO buffer to store the trajectory within a certain time window.
   
-    - batch_size: Number of data samples drawn from memory to train the neural network.
+    - **batch_size**: Number of data samples drawn from memory to train the neural network.
 
 - **Core Functions**
   
