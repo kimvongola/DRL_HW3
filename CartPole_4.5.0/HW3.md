@@ -68,7 +68,7 @@ This class should include:
     - **Batch size**: Number of experiences to sample per batch.
 
 - **Core Functions**
-    - `scale_action`: scale the action (if it is computed from the sigmoid or softmax function) to the proper length.
+    - `scale_action()`: scale the action (if it is computed from the sigmoid or softmax function) to the proper length.
 
     - `decay_epsilon()`: Decreases epsilon over time and returns the updated value.
 
