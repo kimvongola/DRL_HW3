@@ -76,7 +76,7 @@ Additional details about these functions are provided in the class file. You may
 
 #### 2. Replay Buffer Class
 
-A class use to store state, action, reward, and next state from each timestep in episode to use as a dataset to train neural networks. This class should include:
+A class use to store state, action, reward, next state, and termination status from each timestep in episode to use as a dataset to train neural networks. This class should include:
 
 - **Constructor `(__init__)`** to initialize the following parameters:
   
@@ -86,9 +86,11 @@ A class use to store state, action, reward, and next state from each timestep in
 
 - **Core Functions**
   
-    - `add()`: Add state, action, reward, and next state to the FIFO buffer. Discard the oldest data in the buffer
+    - `add()`: Add state, action, reward, next state, and termination status to the FIFO buffer. Discard the oldest data in the buffer
     
     - `sample()`: Sample data from memory to use in the neural network training.
+ 
+  Note that some algorithms may not use all of the data mentioned above to train the neural network.
 
 #### 3. Algorithm folder
 
