@@ -8,12 +8,6 @@ Similar to the previous homework, this assignment focuses on the **Stabilizing C
 
 Additionally, as in the previous homework, the `CartPole` extension repository includes configurations for the **Swing-up Cart-Pole Task** as an optional resource for students seeking a more challenging task.
 
-### Single Agent Training
-![Single-Agent](https://github.com/S-Tuchapong/FRA503-Deep-Reinforcement-Learning-for-Robotics/blob/main/CartPole_4.5.0/HW%20materials/Stabilize%20Cart-Pole%20Task.webm)
-
-### Parallel-Agent Training
-![Parallel-Agent](https://github.com/S-Tuchapong/FRA503-Deep-Reinforcement-Learning-for-Robotics/blob/main/CartPole_4.5.0/HW%20materials/parallel_training.mkv)
-
 ### Learning Objectives:
 1. Understand how **function approximation** works and how to implement it.
 
@@ -114,12 +108,12 @@ You need to implement the `training loop` in train script and `main()` in the pl
 1. `Stabilizing` Cart-Pole Task
 
     ```
-    python scripts/RL_Algorithm/train.py --task Stabilize-Isaac-Cartpole-v0 
+    python scripts/Function_based/train.py --task Stabilize-Isaac-Cartpole-v0 
     ```
 
 2. `Swing-up` Cart-Pole Task (Optional)
     ```
-    python scripts/RL_Algorithm/train.py --task SwingUp-Isaac-Cartpole-v0
+    python scripts/Function_based/train.py --task SwingUp-Isaac-Cartpole-v0
     ```
 
 #### Playing
@@ -127,12 +121,12 @@ You need to implement the `training loop` in train script and `main()` in the pl
 1. `Stabilize` Cart-Pole Task
 
     ```
-    python scripts/RL_Algorithm/play.py --task Stabilize-Isaac-Cartpole-v0 
+    python scripts/Function_based/play.py --task Stabilize-Isaac-Cartpole-v0 
     ```
 
 2. `Swing-up` Cart-Pole Task (Optional)
     ```
-    python scripts/RL_Algorithm/play.py --task SwingUp-Isaac-Cartpole-v0 
+    python scripts/Function_based/play.py --task SwingUp-Isaac-Cartpole-v0 
     ```
 
 ### Part 4: Evaluate `Cart-Pole` Agent performance.
