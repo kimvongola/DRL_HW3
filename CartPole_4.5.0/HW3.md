@@ -74,7 +74,23 @@ This class should include:
 
 Additional details about these functions are provided in the class file. You may also implement additional functions for further analysis.
 
-#### 2. Algorithm folder
+#### 2. Replay Buffer Class
+
+A class use to store state, action, reward, and next state from each timestep in episode to use as a dataset to train neural networks. This class should include:
+
+- **Constructor `(__init__)`** to initialize the following parameters:
+  
+    - memory: FIFO buffer to store the trajectory within a certain time window.
+  
+    - batch_size: Number of data samples drawn from memory to train the neural network.
+
+- **Core Functions**
+  
+    - `add()`: Add state, action, reward, and next state to the FIFO buffer. Discard the oldest data in the buffer
+    
+    - `sample()`: Sample data from memory to use in the neural network training.
+
+#### 3. Algorithm folder
 
 This folder should include:
 
