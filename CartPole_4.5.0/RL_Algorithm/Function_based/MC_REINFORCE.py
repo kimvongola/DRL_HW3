@@ -195,7 +195,7 @@ class MC_REINFORCE(BaseAlgorithm):
         pass
         # ====================================== #
     
-    def lean(self, env):
+    def learn(self, env):
         """
         Train the agent on a single episode.
 

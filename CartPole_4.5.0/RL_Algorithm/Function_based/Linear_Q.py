@@ -61,6 +61,40 @@ class Linear_QN(BaseAlgorithm):
         pass
         # ====================================== #
 
+    def select_action(self, state):
+        """
+        Select an action based on an epsilon-greedy policy.
+        
+        Args:
+            state (Tensor): The current state of the environment.
+        
+        Returns:
+            Tensor: The selected action.
+        """
+        # ========= put your code here ========= #
+        pass
+        # ====================================== #
+
+    def learn(self, env, max_steps):
+        """
+        Train the agent on a single step.
+
+        Args:
+            env: The environment in which the agent interacts.
+            max_steps (int): Maximum number of steps per episode.
+        """
+
+        # ===== Initialize trajectory collection variables ===== #
+        # Reset environment to get initial state (tensor)
+        # Track total episode return (float)
+        # Flag to indicate episode termination (boolean)
+        # Step counter (int)
+        # ========= put your code here ========= #
+        pass
+        # ====================================== #
+    
+
+
 
 
     

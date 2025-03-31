@@ -136,34 +136,6 @@ class BaseAlgorithm():
         pass
         # ====================================== #
     
-    def get_dis_action(self, obs_dis):
-        """
-        Select an action using an epsilon-greedy policy.
-
-        Args:
-            obs_dis (tuple): Discretized observation.
-
-        Returns:
-            int: Chosen discrete action index.
-        """
-        # ========= put your code here ========= #
-        pass
-        # ====================================== #
-
-    def get_action(self, obs):
-        """
-        Get action based on epsilon-greedy policy.
-
-        Args:
-            obs (dict): The observation state.
-
-        Returns:
-            torch.Tensor, int: Scaled action tensor and chosen action index.
-        """
-        # ========= put your code here ========= #
-        pass
-        # ====================================== #
-    
     def decay_epsilon(self):
         """
         Decay epsilon value to reduce exploration over time.

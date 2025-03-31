@@ -74,9 +74,7 @@ This class should include:
     - **Batch size**: Number of experiences to sample per batch.
 
 - **Core Functions**
-    - `get_dis_action()`: Returns a discrete action based on the current policy. This will only be used in Deep Q-learning.
-
-    - `get_action()`: Returns a discrete action based on the current policy.
+    - `scale_action`: scale the action (if it is computed from the sigmoid or softmax function) to the proper length.
 
     - `decay_epsilon()`: Decreases epsilon over time and returns the updated value.
 
@@ -101,6 +99,10 @@ Each class should **inherit** from the `RL Base class` in `RL_base_function.py` 
 - Superclass Initialization (`super().__init__()`).
 
 - An `update()` function that updates the agent’s learnable parameters and advances the training step.
+
+- A `select_action()` function select the action according to current policy.
+
+- A `learn()` function that train the regression or neural network.
 
 
 ### Part 3: Trainning & Playing to stabilize `Cart-Pole` Agent.

@@ -207,7 +207,7 @@ class DQN(BaseAlgorithm):
         pass
         # ====================================== #
 
-    def lean(self, env):
+    def learn(self, env):
         """
         Train the agent on a single step.
 
