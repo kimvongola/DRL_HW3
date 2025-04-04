@@ -70,7 +70,9 @@ class Linear_QN(BaseAlgorithm):
         td_error = reward + self.discount_factor * next_q_value - current_q_value
         
         # Update the weights using the learning rate
-        self.weights += self.learning_rate * td_error * self.feature_extractor(obs, action)
+        self.w += self.learning_rate * td_error * self.feature_extractor(obs, action)
+
+        self.training_error.append(td_error)
         pass
         # ====================================== #
 
