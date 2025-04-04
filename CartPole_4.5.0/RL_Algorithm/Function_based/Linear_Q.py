@@ -70,7 +70,7 @@ class Linear_QN(BaseAlgorithm):
         td_error = reward + self.discount_factor * next_q_value - current_q_value
         
         # Update the weights using the learning rate
-        self.w += self.learning_rate * td_error * self.feature_extractor(obs, action)
+        self.w += self.learning_rate * td_error * feature_vector
 
         self.training_error.append(td_error)
         pass
@@ -87,6 +87,14 @@ class Linear_QN(BaseAlgorithm):
             Tensor: The selected action.
         """
         # ========= put your code here ========= #
+    if np.random.rand() < self.epsilon:
+        # Exploration: Choose a random action
+        action = np.random.choice(self.num_of_action)
+    else:
+        # Exploitation: Choose the best action (highest Q-value)
+        action_values = self.w.dot(state)
+        action = np.argmax(action_values)
+        return action
         pass
         # ====================================== #
 
@@ -105,6 +113,36 @@ class Linear_QN(BaseAlgorithm):
         # Flag to indicate episode termination (boolean)
         # Step counter (int)
         # ========= put your code here ========= #
+            # ===== Initialize trajectory collection variables ===== #
+        total_reward = 0  # Track total reward accumulated in the episode
+        done = False  # Flag to indicate if the episode has terminated
+        steps = 0  # Step counter
+        # Reset environment to get initial state
+        state, _ = env.reset()  # Assuming reset() returns a state and info
+    
+        # ===== Main loop for each episode ===== #
+        while not done and steps < max_steps:
+            # Select an action based on the epsilon-greedy policy
+            action = self.select_action(state)
+    
+            # Take the action and observe the next state and reward
+            next_state, reward, terminated, truncated, _ = env.step(action)
+    
+            # Update the agent's knowledge (Q-values or weights)
+            self.update(state, action, reward, next_state, terminated)
+    
+            # Update total reward and step counter
+            total_reward += reward
+            steps += 1
+    
+            # If the episode ends (either terminated or truncated), set done to True
+            done = terminated or truncated
+    
+            # Move to the next state
+            state = next_state
+    
+        # Optionally: track or return the total reward for logging or analysis
+        return total_reward
         pass
         # ====================================== #
     
