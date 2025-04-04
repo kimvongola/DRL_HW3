@@ -58,6 +58,19 @@ class Linear_QN(BaseAlgorithm):
 
         """
         # ========= put your code here ========= #
+            # Linear function approximation for Q-values
+        feature_vector=super.discretize_state(obs)
+        next_feature_vector=super.discretize_state(next_obs)
+        current_q_value = self.weights.dot(feature_vector)  # Dot product of weights and feature vector for the current state-action pair
+        
+        # Calculate the next Q-value using the next state (and next action if SARSA)
+        next_q_value = self.weights.dot(next_feature_vector) if not terminated else 0
+        
+        # Calculate TD error
+        td_error = reward + self.discount_factor * next_q_value - current_q_value
+        
+        # Update the weights using the learning rate
+        self.weights += self.learning_rate * td_error * self.feature_extractor(obs, action)
         pass
         # ====================================== #
 
