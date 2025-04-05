@@ -73,7 +73,7 @@ class Linear_QN(BaseAlgorithm):
         self.w += self.learning_rate * td_error * feature_vector
 
         self.training_error.append(td_error)
-        pass
+        
         # ====================================== #
 
     def select_action(self, state):
@@ -95,7 +95,7 @@ class Linear_QN(BaseAlgorithm):
         action_values = self.w.dot(state)
         action = np.argmax(action_values)
         return action
-        pass
+        
         # ====================================== #
 
     def learn(self, env, max_steps):
@@ -113,14 +113,14 @@ class Linear_QN(BaseAlgorithm):
         # Flag to indicate episode termination (boolean)
         # Step counter (int)
         # ========= put your code here ========= #
-            # ===== Initialize trajectory collection variables ===== #
+        # Initialize trajectory collection variables
         total_reward = 0  # Track total reward accumulated in the episode
         done = False  # Flag to indicate if the episode has terminated
         steps = 0  # Step counter
         # Reset environment to get initial state
         state, _ = env.reset()  # Assuming reset() returns a state and info
     
-        # ===== Main loop for each episode ===== #
+        # Main loop for each episode
         while not done and steps < max_steps:
             # Select an action based on the epsilon-greedy policy
             action = self.select_action(state)
@@ -129,8 +129,9 @@ class Linear_QN(BaseAlgorithm):
             next_state, reward, terminated, truncated, _ = env.step(action)
     
             # Update the agent's knowledge (Q-values or weights)
-            self.update(state, action, reward, next_state, terminated)
-    
+            next_action = self.select_action(next_state)  # In case of SARSA, select the next action
+            self.update(state, action, reward, next_state, next_action, terminated)
+
             # Update total reward and step counter
             total_reward += reward
             steps += 1
@@ -143,7 +144,6 @@ class Linear_QN(BaseAlgorithm):
     
         # Optionally: track or return the total reward for logging or analysis
         return total_reward
-        pass
         # ====================================== #
     
 
