@@ -40,6 +40,8 @@ class ReplayBuffer:
             next_state (Tensor): The next state resulting from the action.
             done (bool): Whether the episode has terminated.
         """
+        experience = (state, action, reward, next_state, done)
+        self.memory.append(experience)
 
     def sample(self):
         """
@@ -52,6 +54,12 @@ class ReplayBuffer:
             - next_state_batch: Batch of next states.
             - done_batch: Batch of terminal state flags.
         """
+        batch = random.sample(self.memory, k=self.batch_size)
+
+        # แยก component แต่ละอันออกจาก tuple
+        state_batch, action_batch, reward_batch, next_state_batch, done_batch = zip(*batch)
+
+        return state_batch, action_batch, reward_batch, next_state_batch, done_batch
 
     def __len__(self):
         """
@@ -112,12 +120,13 @@ class BaseAlgorithm():
     def q(self, obs, a=None):
         """Returns the linearly-estimated Q-value for a given state and action."""
         # ========= put your code here ========= #
+        obs = np.array(obs)
         if a==None:
             # Get q values from all action in state
-            pass
+            return obs @ self.w
         else:
             # Get q values given action & state
-            pass
+            return float(obs @ self.w[:,a])
         # ====================================== #
         
     
@@ -132,8 +141,19 @@ class BaseAlgorithm():
         Returns:
             torch.Tensor: Scaled action tensor.
         """
+
         # ========= put your code here ========= #
-        pass
+        # ใช้ตัวแปรจาก __init__
+        action_min, action_max = self.action_range
+        n = self.num_of_action
+
+        # แปลง action index → normalized [0, 1]
+        normalized = action / (n - 1)
+
+        # แปลงเป็นค่าต่อเนื่องในช่วง [action_min, action_max]
+        continuous_action = action_min + normalized * (action_max - action_min)
+
+        return torch.tensor([continuous_action], dtype=torch.float32)
         # ====================================== #
     
     def decay_epsilon(self):
@@ -149,7 +169,11 @@ class BaseAlgorithm():
         Save weight parameters.
         """
         # ========= put your code here ========= #
-        pass
+        os.makedirs(path, exist_ok=True)  # สร้าง path หากยังไม่มี
+        full_path = os.path.join(path, filename)
+
+        np.save(full_path, self.w)  # บันทึกน้ำหนักลงไฟล์ .npy
+        print(f"Saved weights to {full_path}")
         # ====================================== #
             
     def load_w(self, path, filename):
@@ -157,7 +181,13 @@ class BaseAlgorithm():
         Load weight parameters.
         """
         # ========= put your code here ========= #
-        pass
+        full_path = os.path.join(path, filename)
+
+        if not os.path.isfile(full_path):
+            raise FileNotFoundError(f"Weight file not found: {full_path}")
+
+        self.w = np.load(full_path)
+        print(f"Loaded weights from {full_path}")
         # ====================================== #
 
 
