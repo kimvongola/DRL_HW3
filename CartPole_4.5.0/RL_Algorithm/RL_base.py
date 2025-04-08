@@ -4,7 +4,7 @@ from enum import Enum
 import os
 import json
 import torch
-
+import math
 
 class ControlType(Enum):
     """
@@ -14,6 +14,7 @@ class ControlType(Enum):
     TEMPORAL_DIFFERENCE = 2
     Q_LEARNING = 3
     DOUBLE_Q_LEARNING = 4
+    SARSA=5
 
 
 class BaseAlgorithm():
@@ -80,8 +81,33 @@ class BaseAlgorithm():
         Returns:
             Tuple[pose_cart:int, pose_pole:int, vel_cart:int, vel_pole:int]: Discretized state.
         """
-
         # ========= put your code here =========#
+        num_bins_cart_pose = self.discretize_state_weight[0]
+        num_bins_cart_vel = self.discretize_state_weight[2]
+        num_bins_pole_pose = self.discretize_state_weight[1]
+        num_bins_pole_vel = self.discretize_state_weight[3]
+
+        # Define bins correctly using individual values
+        cart_pose_bins = np.linspace(-3.0, 3.0, int(num_bins_cart_pose))
+        cart_vel_bins = np.linspace(-3.0, 3.0, int(num_bins_cart_vel))
+        pole_pose_bins = np.linspace(np.deg2rad(-24.0),np.deg2rad(24.0), int(num_bins_pole_pose))
+        pole_vel_bins = np.linspace(-10.0, 10.0, int(num_bins_pole_vel))
+
+        # Extract values from observation dictionary
+        obs_array=obs['policy'][0]
+        obs_cart_pose = obs_array[0].item()
+        obs_cart_vel = obs_array[2].item()
+        obs_pole_pose = obs_array[1].item()
+        obs_pole_vel = obs_array[3].item()
+
+        # Convert continuous values to discrete bins
+        cart_pose = np.digitize(obs_cart_pose, cart_pose_bins) - 1
+        cart_vel = np.digitize(obs_cart_vel, cart_vel_bins) - 1
+        pole_pose = np.digitize(obs_pole_pose, pole_pose_bins) - 1
+        pole_vel = np.digitize(obs_pole_vel, pole_vel_bins) - 1
+
+        return (cart_pose, pole_pose, cart_vel, pole_vel)
+
         pass
         # ======================================#
 
@@ -96,7 +122,13 @@ class BaseAlgorithm():
             int: Chosen discrete action index.
         """
         # ========= put your code here =========#
-        pass
+        if obs_dis not in self.q_values:
+            self.q_values[obs_dis] = np.zeros(self.num_of_action)  
+        if np.random.rand()<=self.epsilon:
+            return np.random.randint(self.num_of_action)
+        else:
+            return np.argmax(self.q_values[obs_dis])
+
         # ======================================#
     
     def mapping_action(self, action):
@@ -111,6 +143,10 @@ class BaseAlgorithm():
             torch.Tensor: Scaled action tensor.
         """
         # ========= put your code here =========#
+        action_min,action_max=self.action_range
+        continuous_action = action_min + (action / (self.num_of_action - 1)) * (action_max - action_min)
+
+        return torch.tensor([[continuous_action]], dtype=torch.float32) 
         pass
         # ======================================#s
 
@@ -133,6 +169,7 @@ class BaseAlgorithm():
         """
         Decay epsilon value to reduce exploration over time.
         """
+        self.epsilon = max(self.final_epsilon, self.epsilon * self.epsilon_decay)
 
     def save_q_value(self, path, filename):
         """
@@ -147,26 +184,27 @@ class BaseAlgorithm():
             q_values_str_keys = {str(k): v.tolist() for k, v in self.q_values.items()}
         except:
             q_values_str_keys = {str(k): v for k, v in self.q_values.items()}
+        
         if self.control_type == ControlType.MONTE_CARLO:
             try:
                 n_values_str_keys = {str(k): v.tolist() for k, v in self.n_values.items()}
             except:
                 n_values_str_keys = {str(k): v for k, v in self.n_values.items()}
+
+        # Create the model parameters dictionary
+        model_params = {'q_values': q_values_str_keys}
         
-        # Save model parameters to a JSON file
         if self.control_type == ControlType.MONTE_CARLO:
-            model_params = {
-                'q_values': q_values_str_keys,
-                'n_values': n_values_str_keys
-            }
-        else:
-            model_params = {
-                'q_values': q_values_str_keys,
-            }
+            model_params['n_values'] = n_values_str_keys
+
+        # **Ensure directory exists before saving the file**
+        os.makedirs(path, exist_ok=True)  # Creates the path if it does not exist
+
+        # **Save model parameters to a JSON file**
         full_path = os.path.join(path, filename)
+    
         with open(full_path, 'w') as f:
             json.dump(model_params, f)
-
             
     def load_q_value(self, path, filename):
         """
