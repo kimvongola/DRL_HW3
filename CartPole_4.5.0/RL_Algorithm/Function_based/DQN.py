@@ -21,43 +21,54 @@ class DQN_network(nn.Module):
         n_actions (int): Number of possible actions.
         dropout (float): Dropout rate for regularization.
     """
-    def __init__(self, n_observations, hidden_size, n_actions, dropout):
+    def __init__(self, n_observations, hidden_size, n_actions, dropout=0.0):
         super(DQN_network, self).__init__()
-        # ========= put your code here ========= #
-        pass
-        # ====================================== #
+        # First hidden layer
+        self.fc1 = nn.Linear(n_observations, hidden_size)
+        # Second hidden layer
+        self.fc2 = nn.Linear(hidden_size, hidden_size)
+        # Output layer
+        self.output = nn.Linear(hidden_size, n_actions)
+        # Dropout (optional)
+        self.dropout = nn.Dropout(dropout)
 
     def forward(self, x):
         """
         Forward pass through the network.
-        
+
         Args:
             x (Tensor): Input state tensor.
-        
+
         Returns:
             Tensor: Q-value estimates for each action.
         """
-        # ========= put your code here ========= #
-        pass
-        # ====================================== #
+        x = F.relu(self.fc1(x))       # First hidden layer
+        x = self.dropout(x)
+        x = F.relu(self.fc2(x))       # Second hidden layer
+        x = self.dropout(x)
+        q_values = self.output(x)     # Output layer
+        return q_values
 
 class DQN(BaseAlgorithm):
     def __init__(
             self,
-            device = None,
-            num_of_action: int = 2,
-            action_range: list = [-2.5, 2.5],
-            n_observations: int = 4,
-            hidden_dim: int = 64,
-            dropout: float = 0.5,
-            learning_rate: float = 0.01,
+            
+            num_of_action: int,# = 2,
+            action_range: list,# = [-2.5, 2.5],
+            hidden_dim: int,# = 64,
+            learning_rate: float,# = 0.01,
+            initial_epsilon: float,# = 1.0,
+            epsilon_decay: float,# = 1e-3,
+            final_epsilon: float,# = 0.001,
+            discount_factor: float,# = 0.95,
+            buffer_size: int,# = 1000,
+            batch_size: int,# = 1,
+            device = torch.device("cuda" if torch.cuda.is_available() else "cpu"),
             tau: float = 0.005,
-            initial_epsilon: float = 1.0,
-            epsilon_decay: float = 1e-3,
-            final_epsilon: float = 0.001,
-            discount_factor: float = 0.95,
-            buffer_size: int = 1000,
-            batch_size: int = 1,
+            dropout: float = 0.2,
+            n_observations: int = 4,
+
+
     ) -> None:
         """
         Initialize the CartPole Agent.
@@ -75,7 +86,6 @@ class DQN(BaseAlgorithm):
         self.policy_net = DQN_network(n_observations, hidden_dim, num_of_action, dropout).to(device)
         self.target_net = DQN_network(n_observations, hidden_dim, num_of_action, dropout).to(device)
         self.target_net.load_state_dict(self.policy_net.state_dict())
-
         self.device = device
         self.steps_done = 0
         self.num_of_action = num_of_action
@@ -123,7 +133,21 @@ class DQN(BaseAlgorithm):
             Tensor: The selected action.
         """
         # ========= put your code here ========= #
-        pass
+        if np.random.rand() < self.epsilon:
+            # Exploration
+            action_idx = np.random.randint(self.num_of_action)
+        else:
+            # Exploitation
+            # self.policy_net.eval()
+            with torch.no_grad():
+                q_values = self.policy_net(state)  # Add batch dimension: (1, state_dim)
+
+
+            action_idx = torch.argmax(q_values).item()      # Choose best action
+        # self.policy_net.train()  # optional
+        print(action_idx)
+        action_tensor = self.scale_action(action_idx)  # Map index to real value
+        return action_tensor, action_idx
         # ====================================== #
 
     def calculate_loss(self, non_final_mask, non_final_next_states, state_batch, action_batch, reward_batch):
@@ -141,7 +165,27 @@ class DQN(BaseAlgorithm):
             Tensor: Computed loss.
         """
         # ========= put your code here ========= #
-        pass
+        state_action_values = self.policy_net(state_batch).gather(1, action_batch)
+
+        # Initialize next state values to 0
+        next_state_values = torch.zeros(state_batch.size(0), 1, device=self.device)
+        if non_final_next_states.dim() == 3:
+            print(non_final_next_states)
+            non_final_next_states = non_final_next_states.squeeze(1)
+
+        # Compute Q(s', a') for non-final next states
+        with torch.no_grad():
+            max_next_q_values = self.target_net(non_final_next_states).max(1, keepdim=True)[0]
+            next_state_values[non_final_mask] = max_next_q_values
+
+        # Compute expected Q values
+        expected_state_action_values = reward_batch + (self.discount_factor * next_state_values)
+
+        # Loss = MSE(Q_estimate, Q_target)
+        loss = nn.MSELoss()(state_action_values, expected_state_action_values)
+        # loss = F.smooth_l1_loss(state_action_values, expected_state_action_values)
+
+        return loss
         # ====================================== #
 
     def generate_sample(self, batch_size):
@@ -159,12 +203,41 @@ class DQN(BaseAlgorithm):
         # Ensure there are enough samples in memory before proceeding
         # ========= put your code here ========= #
         # Sample a batch from memory
+        if len(self.memory) < batch_size:
+            return None  # Not enough data to sample
         batch = self.memory.sample()
         # ====================================== #
-        
+
         # Sample a batch from memory
+        states, actions, rewards, next_states, dones = batch
+        # แปลงเป็น Tensor
+        state_batch = torch.stack(states).to(self.device)
+        # print(state_batch.shape)
+        if state_batch.dim() == 3:
+            state_batch = state_batch.squeeze(1)
+        actions = [a for a in actions]  # flatten + convert to int
+        action_batch = torch.tensor(actions, dtype=torch.int64).unsqueeze(1).to(self.device)
+        # if action_batch>20 or action_batch<0:
+        #     print(action_batch)
+
+        # action_batch = torch.tensor(actions, dtype=torch.int64).unsqueeze(1).to(self.device)
+
+        # reward_batch = torch.tensor(rewards, dtype=torch.float32).unsqueeze(1).to(self.device)
+        reward_batch = torch.tensor(rewards, dtype=torch.float32).unsqueeze(1).to(self.device)
+
+        # สร้าง mask สำหรับ non-final state
+        non_final_mask = torch.tensor([not d for d in dones], dtype=torch.bool).to(self.device)
+
+        non_final_next_states = torch.stack(
+            [s for s, d in zip(next_states, dones) if not d]
+        ).to(self.device)
+        non_final_next_states=non_final_next_states.squeeze(1)
+        # print("non_final_next_states shape:", non_final_next_states.shape)
+        # print("device:", non_final_next_states.device)
+
+        return non_final_mask, non_final_next_states, state_batch, action_batch, reward_batch
         # ========= put your code here ========= #
-        pass
+        
         # ====================================== #
 
     def update_policy(self):
@@ -175,17 +248,23 @@ class DQN(BaseAlgorithm):
             float: Loss value after the update.
         """
         # Generate a sample batch
+        if len(self.memory) < self.batch_size:
+            return  # wait until enough data
+        
         sample = self.generate_sample(self.batch_size)
         if sample is None:
             return
         non_final_mask, non_final_next_states, state_batch, action_batch, reward_batch = sample
-        
         # Compute loss
         loss = self.calculate_loss(non_final_mask, non_final_next_states, state_batch, action_batch, reward_batch)
 
         # Perform gradient descent step
         # ========= put your code here ========= #
-        pass
+        self.optimizer.zero_grad()
+        loss.backward()
+        self.optimizer.step()
+
+        return loss.item()
         # ====================================== #
 
     def update_target_networks(self):
@@ -194,17 +273,23 @@ class DQN(BaseAlgorithm):
         """
         # Retrieve the state dictionaries (weights) of both networks
         # ========= put your code here ========= #
-        pass
+
+
+
+        policy_params = self.policy_net.state_dict()
+        target_params = self.target_net.state_dict()
         # ====================================== #
         
         # Apply the soft update rule to each parameter in the target network
         # ========= put your code here ========= #
-        pass
+        for key in policy_params:
+            target_params[key] = self.tau * policy_params[key] + (1.0 - self.tau) * target_params[key].clone()
         # ====================================== #
         
         # Load the updated weights into the target network
         # ========= put your code here ========= #
-        pass
+        self.target_net.load_state_dict(target_params)
+
         # ====================================== #
 
     def learn(self, env):
@@ -221,23 +306,27 @@ class DQN(BaseAlgorithm):
         # Flag to indicate episode termination (boolean)
         # Step counter (int)
         # ========= put your code here ========= #
-        pass
+        state, _ = env.reset()                 # เริ่มต้น environment
+        total_reward = 0.0                     # สะสม reward
+        done = False                           # ตัวแปรสำหรับจบ episode
+        timestep = 0                           # นับจำนวน timestep
         # ====================================== #
 
         while not done:
             # Predict action from the policy network
             # ========= put your code here ========= #
-            pass
+            action = self.select_action(state)
             # ====================================== #
 
             # Execute action in the environment and observe next state and reward
             # ========= put your code here ========= #
-            pass
+            next_state, reward, terminated, truncated, _ = env.step(action)
+            done = terminated or truncated
             # ====================================== #
 
             # Store the transition in memory
             # ========= put your code here ========= #
-            pass
+            self.memory.add(state, action, reward, next_state, done)
             # ====================================== #
 
             # Update state
@@ -246,12 +335,13 @@ class DQN(BaseAlgorithm):
             self.update_policy()
 
             # Soft update of the target network's weights
-            self.update_weights()
+            self.update_target_networks()
 
             timestep += 1
             if done:
                 self.plot_durations(timestep)
                 break
+        # ====================================== #
 
     # Consider modifying this function to visualize other aspects of the training process.
     # ================================================================================== #

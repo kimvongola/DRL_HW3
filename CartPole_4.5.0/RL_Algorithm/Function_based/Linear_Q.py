@@ -1,18 +1,22 @@
 from __future__ import annotations
 import numpy as np
+import torch
 from RL_Algorithm.RL_base_function import BaseAlgorithm
 
 
 class Linear_QN(BaseAlgorithm):
     def __init__(
             self,
-            num_of_action: int = 2,
-            action_range: list = [-2.5, 2.5],
-            learning_rate: float = 0.01,
-            initial_epsilon: float = 1.0,
-            epsilon_decay: float = 1e-3,
-            final_epsilon: float = 0.001,
-            discount_factor: float = 0.95,
+
+            num_of_action: int, #= 2,
+            action_range: list ,#= [-2.5, 2.5],
+            learning_rate: float ,#= 0.01,
+            initial_epsilon: float, #= 1.0,
+            epsilon_decay: float, #= 1e-3,
+            final_epsilon: float, #= 0.001,
+            discount_factor: float, #= 0.95,
+            buffer_size: int ,#= 1000,
+            batch_size: int #= 1,  
     ) -> None:
         """
         Initialize the CartPole Agent.
@@ -33,6 +37,9 @@ class Linear_QN(BaseAlgorithm):
             epsilon_decay=epsilon_decay,
             final_epsilon=final_epsilon,
             discount_factor=discount_factor,
+            buffer_size=buffer_size,
+            batch_size=batch_size
+         
         )
         
     def update(
@@ -55,24 +62,39 @@ class Linear_QN(BaseAlgorithm):
             next_obs (dict): The next state observation.
             next_action (int): The action taken in the next state (used in SARSA).
             terminated (bool): Whether the episode has ended.
-
         """
         # ========= put your code here ========= #
-            # Linear function approximation for Q-values
-        feature_vector=super.discretize_state(obs)
-        next_feature_vector=super.discretize_state(next_obs)
-        current_q_value = self.weights.dot(feature_vector)  # Dot product of weights and feature vector for the current state-action pair
-        
-        # Calculate the next Q-value using the next state (and next action if SARSA)
-        next_q_value = self.weights.dot(next_feature_vector) if not terminated else 0
-        
-        # Calculate TD error
-        td_error = reward + self.discount_factor * next_q_value - current_q_value
-        
-        # Update the weights using the learning rate
-        self.w += self.learning_rate * td_error * feature_vector
 
-        self.training_error.append(td_error)
+        # Get the feature vector for the current state
+        feature_vector = obs['policy'].detach().cpu().numpy().astype(np.float32).flatten()
+        feature_vector /= (np.linalg.norm(feature_vector) + 1e-8)
+
+        # Get the Q-value for the next state-action pair
+        next_feature_vector = next_obs['policy'].detach().cpu().numpy().astype(np.float32)
+        
+        # Get current Q-value for the selected action
+        current_q_values = self.q(obs, action)
+
+
+        # Calculate next Q-value (use max if not terminated, otherwise 0)
+        next_q_value = self.q(next_obs)
+        if terminated:
+            target = reward
+        else:
+            target = reward + self.discount_factor * np.max(next_q_value)
+        # Calculate the TD error
+        td_error = target-current_q_values
+
+        # td_error = np.clip(td_error, -0.5, 0.5)
+
+
+
+        self.w[:, action] += self.lr * td_error * feature_vector  # Update the weights
+
+        # self.w = np.clip(self.w, -0.1, 0.1)
+        # self.w*=0.999
+
+        # self.training_error.append(td_error)
         
         # ====================================== #
 
@@ -87,14 +109,19 @@ class Linear_QN(BaseAlgorithm):
             Tensor: The selected action.
         """
         # ========= put your code here ========= #
-    if np.random.rand() < self.epsilon:
-        # Exploration: Choose a random action
-        action = np.random.choice(self.num_of_action)
-    else:
-        # Exploitation: Choose the best action (highest Q-value)
-        action_values = self.w.dot(state)
-        action = np.argmax(action_values)
-        return action
+
+        action_values = np.dot(state, self.w)  # shape: (num_actions,)
+        
+        if np.random.rand() < self.epsilon:
+            # Exploration
+            action = np.random.randint(self.num_of_action)
+        else:
+            # Exploitation with uncertainty (softmax sampling)
+            action=np.argmax(action_values)
+
+        action_tensor = self.scale_action(action)
+        return action_tensor, action
+        # return torch.tensor(action,dtype=torch.float32)
         
         # ====================================== #
 
@@ -119,18 +146,18 @@ class Linear_QN(BaseAlgorithm):
         steps = 0  # Step counter
         # Reset environment to get initial state
         state, _ = env.reset()  # Assuming reset() returns a state and info
-    
         # Main loop for each episode
         while not done and steps < max_steps:
             # Select an action based on the epsilon-greedy policy
-            action = self.select_action(state)
-    
+            discrete_state=state['policy'].detach().cpu().float()
+            action,action_idx = self.select_action(discrete_state)
             # Take the action and observe the next state and reward
             next_state, reward, terminated, truncated, _ = env.step(action)
     
             # Update the agent's knowledge (Q-values or weights)
-            next_action = self.select_action(next_state)  # In case of SARSA, select the next action
-            self.update(state, action, reward, next_state, next_action, terminated)
+            discrete_next_state=next_state['policy'].detach().cpu().float()
+            next_action,next_action_idx = self.select_action(discrete_next_state)  # In case of SARSA, select the next action
+            self.update(state, action_idx, reward, next_state, next_action_idx, done)
 
             # Update total reward and step counter
             total_reward += reward
@@ -145,7 +172,7 @@ class Linear_QN(BaseAlgorithm):
         # Optionally: track or return the total reward for logging or analysis
         return total_reward
         # ====================================== #
-    
+
 
 
 
