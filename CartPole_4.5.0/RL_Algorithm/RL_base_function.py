@@ -58,7 +58,6 @@ class ReplayBuffer:
 
         # แยก component แต่ละอันออกจาก tuple
         state_batch, action_batch, reward_batch, next_state_batch, done_batch = zip(*batch)
-
         return state_batch, action_batch, reward_batch, next_state_batch, done_batch
 
     def __len__(self):
@@ -91,15 +90,16 @@ class BaseAlgorithm():
 
     def __init__(
         self,
-        num_of_action: int = 2,
-        action_range: list = [-2.0, 2.0],
-        learning_rate: float = 1e-3,
-        initial_epsilon: float = 1.0,
-        epsilon_decay: float = 1e-3,
-        final_epsilon: float = 0.001,
-        discount_factor: float = 0.95,
-        buffer_size: int = 1000,
-        batch_size: int = 1,
+
+        num_of_action: int, #= 2,
+        action_range: list, #= [-2.0, 2.0],
+        learning_rate: float ,#= 1e-3,
+        initial_epsilon: float ,#= 1.0,
+        epsilon_decay: float, #= 1e-3,
+        final_epsilon: float ,#= 0.001,
+        discount_factor: float, #= 0.95,
+        buffer_size: int ,#= 1000,
+        batch_size: int #= 1,  
     ):
         self.lr = learning_rate
         self.discount_factor = discount_factor
@@ -120,13 +120,18 @@ class BaseAlgorithm():
     def q(self, obs, a=None):
         """Returns the linearly-estimated Q-value for a given state and action."""
         # ========= put your code here ========= #
-        obs = np.array(obs)
-        if a==None:
-            # Get q values from all action in state
-            return obs @ self.w
+        # Extract the policy tensor from the dictionary
+        state_features = obs['policy'].detach().cpu().numpy().astype(np.float32).flatten()
+
+    
+        # Compute Q-values
+        if a is not None:
+            return float(np.dot(state_features, self.w[:, a]))
+
         else:
-            # Get q values given action & state
-            return float(obs @ self.w[:,a])
+            return np.dot(state_features, self.w)  # returns shape (num_actions,)
+
+
         # ====================================== #
         
     
@@ -143,17 +148,20 @@ class BaseAlgorithm():
         """
 
         # ========= put your code here ========= #
-        # ใช้ตัวแปรจาก __init__
+        # # ใช้ตัวแปรจาก __init__
         action_min, action_max = self.action_range
-        n = self.num_of_action
+        # n = self.num_of_action
 
-        # แปลง action index → normalized [0, 1]
-        normalized = action / (n - 1)
+        # # แปลง action index → normalized [0, 1]
+        # normalized = action / (n - 1)
 
-        # แปลงเป็นค่าต่อเนื่องในช่วง [action_min, action_max]
-        continuous_action = action_min + normalized * (action_max - action_min)
+        # # แปลงเป็นค่าต่อเนื่องในช่วง [action_min, action_max]
+        # continuous_action = action_min + normalized * (action_max - action_min)
+        action_min,action_max=self.action_range
+        continuous_action = action_min + (action / (self.num_of_action - 1)) * (action_max - action_min)
 
-        return torch.tensor([continuous_action], dtype=torch.float32)
+        return torch.tensor([[continuous_action]], dtype=torch.float32) 
+        pass
         # ====================================== #
     
     def decay_epsilon(self):
@@ -167,13 +175,23 @@ class BaseAlgorithm():
 
     def save_w(self, path, filename):
         """
-        Save weight parameters.
+        Save weight parameters to a JSON file.
         """
-        # ========= put your code here ========= #
-        os.makedirs(path, exist_ok=True)  # สร้าง path หากยังไม่มี
+        os.makedirs(path, exist_ok=True)
+        
+        # Ensure it ends in .json
+        if not filename.endswith(".json"):
+            filename += ".json"
+
         full_path = os.path.join(path, filename)
 
-        np.save(full_path, self.w)  # บันทึกน้ำหนักลงไฟล์ .npy
+        # Convert NumPy array to nested list
+        weights_list = self.w.tolist()
+
+        # Save to JSON
+        with open(full_path, 'w') as f:
+            json.dump(weights_list, f, indent=4)
+
         print(f"Saved weights to {full_path}")
         # ====================================== #
             
@@ -190,5 +208,3 @@ class BaseAlgorithm():
         self.w = np.load(full_path)
         print(f"Loaded weights from {full_path}")
         # ====================================== #
-
-
